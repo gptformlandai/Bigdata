@@ -362,6 +362,8 @@ For every system design topic, include:
 
 ## Phase 13: Interview Mastery
 
+Status: Complete.
+
 271. Big Data resume project ideas
 272. Common Big Data interview questions
 273. Spark interview questions

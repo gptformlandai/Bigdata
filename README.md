@@ -190,6 +190,17 @@ After every phase, review:
         +-- topic-256-design-youtube-analytics-pipeline.md
         +-- topic-257-...
         +-- topic-270-design-batch-streaming-hybrid-architecture.md
+    +-- phase-13-interview-mastery
+        +-- README.md
+        +-- examples
+            +-- topic_271_resume_bullet_builder.py
+            +-- topic_276_sql_question_generator.py
+            +-- topic_278_system_design_timer_plan.py
+            +-- topic_282_star_story_builder.py
+        +-- phase-13-review.md
+        +-- topic-271-big-data-resume-project-ideas.md
+        +-- topic-272-...
+        +-- topic-285-final-maang-big-data-revision-guide.md
 ```
 
 ## Current Progress
@@ -209,7 +220,8 @@ After every phase, review:
 | Phase 10: Security, Governance, And Compliance | 216-235 | Complete |
 | Phase 11: Advanced Architecture Patterns | 236-255 | Complete |
 | Phase 12: MAANG-Level System Design | 256-270 | Complete |
+| Phase 13: Interview Mastery | 271-285 | Complete |
 
-## Next Topic
+## Track Status
 
-Phase 13, Topic 271: Big Data resume project ideas. Phase 1 is still available if you want to fill the skipped Big Data basics.
+The main roadmap is complete through Phase 13, Topic 285. Phase 1 is still available if you want to fill the skipped Big Data basics.
