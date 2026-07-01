@@ -294,6 +294,8 @@ Status: Complete.
 
 ## Phase 11: Advanced Architecture Patterns
 
+Status: Complete.
+
 236. Lambda architecture
 237. Kappa architecture
 238. Medallion architecture
@@ -316,6 +318,8 @@ Status: Complete.
 255. Data platform reliability
 
 ## Phase 12: MAANG-Level System Design
+
+Status: Complete.
 
 256. Design YouTube analytics pipeline
 257. Design Netflix viewing analytics

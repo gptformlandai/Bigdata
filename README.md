@@ -168,6 +168,28 @@ After every phase, review:
         +-- topic-216-authentication.md
         +-- topic-217-...
         +-- topic-235-governance-at-scale.md
+    +-- phase-11-advanced-architecture-patterns
+        +-- README.md
+        +-- examples
+            +-- topic_240_cdc_apply_changes_demo.py
+            +-- topic_242_outbox_relay_demo.py
+            +-- topic_246_feature_store_point_in_time_demo.py
+            +-- topic_251_metrics_rollup_demo.py
+        +-- phase-11-review.md
+        +-- topic-236-lambda-architecture.md
+        +-- topic-237-...
+        +-- topic-255-data-platform-reliability.md
+    +-- phase-12-maang-system-design
+        +-- README.md
+        +-- examples
+            +-- topic_256_event_volume_estimator.py
+            +-- topic_258_location_partitioning_demo.py
+            +-- topic_264_slo_burn_rate_demo.py
+            +-- topic_268_cdc_merge_plan_demo.py
+        +-- phase-12-review.md
+        +-- topic-256-design-youtube-analytics-pipeline.md
+        +-- topic-257-...
+        +-- topic-270-design-batch-streaming-hybrid-architecture.md
 ```
 
 ## Current Progress
@@ -185,7 +207,9 @@ After every phase, review:
 | Phase 8: Orchestration And DataOps | 176-195 | Complete |
 | Phase 9: Cloud Big Data | 196-215 | Complete |
 | Phase 10: Security, Governance, And Compliance | 216-235 | Complete |
+| Phase 11: Advanced Architecture Patterns | 236-255 | Complete |
+| Phase 12: MAANG-Level System Design | 256-270 | Complete |
 
 ## Next Topic
 
-Phase 11, Topic 236: Lambda architecture. Phase 1 is still available if you want to fill the skipped Big Data basics.
+Phase 13, Topic 271: Big Data resume project ideas. Phase 1 is still available if you want to fill the skipped Big Data basics.
