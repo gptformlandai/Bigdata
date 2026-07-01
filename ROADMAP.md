@@ -79,6 +79,8 @@ Status: Complete.
 
 ## Phase 3: Hadoop Ecosystem
 
+Status: Complete.
+
 61. Hadoop overview
 62. HDFS
 63. NameNode and DataNode
@@ -98,6 +100,8 @@ Status: Complete.
 77. Why Spark replaced MapReduce for many workloads
 
 ## Phase 4: Spark And Batch Processing
+
+Status: Complete.
 
 78. Apache Spark overview
 79. Spark architecture
@@ -130,6 +134,8 @@ Status: Complete.
 106. Spark on EMR/Dataproc/Databricks
 
 ## Phase 5: Streaming And Messaging
+
+Status: Complete.
 
 107. Event-driven architecture
 108. Message queues vs event streams
