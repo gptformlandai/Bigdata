@@ -106,8 +106,9 @@ After every phase, review:
     +-- phase-05-streaming-messaging
         +-- README.md
         +-- examples
-            +-- topic_114_consumer_group_assignment.py
-            +-- topic_132_watermark_window_demo.py
+            +-- topic_112_kafka_partition_consumer_group_simulation.py
+            +-- topic_121_delivery_semantics_simulation.py
+            +-- topic_132_watermark_window_simulation.py
         +-- phase-05-review.md
         +-- topic-107-event-driven-architecture.md
         +-- topic-108-...

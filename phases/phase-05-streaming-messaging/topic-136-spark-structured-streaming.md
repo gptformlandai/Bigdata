@@ -2,154 +2,181 @@
 
 ## 1. Goal
 
-Understand Spark Structured Streaming as Spark's high-level streaming API using DataFrame/SQL concepts.
+Understand Spark Structured Streaming as Spark's high-level streaming API built on DataFrames.
 
 ## 2. Baby Intuition
 
-Structured Streaming lets you write streaming logic like a table query.
+Batch Spark processes a fixed table.
 
-Spark keeps updating the result as new data arrives.
+Structured Streaming treats a stream like a table that keeps growing.
 
-Think:
-
-```text
-same DataFrame style, but input table keeps growing
-```
+You write DataFrame-like logic once, and Spark continuously updates results as new data arrives.
 
 ## 3. What It Is
 
-- Simple definition: Spark Structured Streaming processes streaming data with DataFrames.
-- Technical definition: Spark Structured Streaming is a scalable stream processing engine built on Spark SQL/DataFrames that treats streams as unbounded tables and executes queries incrementally, often in micro-batches.
-- Category: Stream processing API.
-- Related terms: micro-batch, trigger, checkpoint, watermark, output mode, sink.
+- Simple definition: Structured Streaming is Spark's DataFrame-based streaming engine.
+- Technical definition: Spark Structured Streaming is a scalable stream processing engine built on Spark SQL that processes unbounded data as incremental micro-batches or continuous execution, using DataFrame/Dataset APIs.
+- Category: Stream processing engine/API.
+- Related terms: micro-batch, trigger, checkpoint location, watermark, output mode, streaming query.
 
 ## 4. Why It Exists
 
-Teams already using Spark wanted streaming with:
+Spark users wanted streaming without learning a totally separate API.
 
-- DataFrame API
-- Spark SQL
-- integration with batch code
-- Kafka sources
-- file/lakehouse sinks
-- easier streaming model
+Structured Streaming exists to:
 
-Structured Streaming gives one API style for batch and streaming.
+- use DataFrame/Spark SQL concepts for streams
+- process Kafka/file streams
+- support windowed aggregations
+- maintain checkpoints
+- write streaming outputs
+- unify batch and streaming logic
 
 ## 5. Where It Fits In A Data Platform
 
 ```text
-Kafka/files -> Spark Structured Streaming -> Delta/Iceberg/Kafka/DB/dashboard
+Kafka / files
+  -> Spark Structured Streaming
+  -> console/Kafka/data lake/table/database
 ```
 
-Common use:
+Common sources:
 
-- near-real-time ETL
-- streaming ingestion to lakehouse
-- incremental aggregations
-- Kafka-to-table pipelines
+- Kafka
+- files landing in storage
+- rate source for tests
+
+Common sinks:
+
+- Kafka
+- files
+- Delta/lakehouse tables
+- memory/console for debugging
 
 ## 6. How It Works Step By Step
 
 1. Define streaming source.
 2. Apply DataFrame transformations.
-3. Define sink and output mode.
-4. Start query.
-5. Spark processes new data incrementally.
-6. Checkpoint tracks progress/state.
-7. Query keeps running.
-
-Example idea:
-
-```python
-events = spark.readStream.format("kafka").load()
-```
+3. Define output sink.
+4. Set checkpoint location.
+5. Start streaming query.
+6. Spark processes new data in triggers/micro-batches.
+7. Progress is checkpointed.
+8. On failure, query resumes from checkpoint.
 
 ## 7. How To Use It Practically
 
-Kafka read shape:
+Kafka read example:
 
 ```python
-raw = (
+events = (
     spark.readStream
     .format("kafka")
     .option("kafka.bootstrap.servers", "localhost:9092")
-    .option("subscribe", "orders")
+    .option("subscribe", "clicks")
     .load()
 )
 ```
 
-Write shape:
+Write stream:
 
 ```python
 query = (
-    result.writeStream
+    events.writeStream
     .format("parquet")
-    .option("path", "/data/output")
-    .option("checkpointLocation", "/checkpoints/orders")
+    .option("path", "/data/clicks_out")
+    .option("checkpointLocation", "/checkpoints/clicks")
     .outputMode("append")
     .start()
 )
 ```
 
-Checkpoint is mandatory for reliable production streaming.
+Important:
+
+```text
+checkpointLocation is required for reliable recovery.
+```
 
 ## 8. Real-World Scenario
 
-- Product/system: Streaming lakehouse ingestion.
-- Problem: Continuously load Kafka order events into curated tables.
-- How Structured Streaming helps: Uses Spark DataFrame logic and checkpoints to write incremental outputs.
-- What would go wrong without checkpoints: failures may duplicate or skip data.
+- Product/system: Near-real-time click dashboard.
+- Problem: Need update metrics every minute from Kafka click events.
+- How Structured Streaming helps: Reads Kafka and runs DataFrame aggregations continuously.
+- What would go wrong without checkpointing: failure may duplicate or lose progress.
 
 ## 9. System Design Angle
 
-Choose Structured Streaming when:
+Structured Streaming is good when:
 
 - team already uses Spark
-- near-real-time is enough
-- data lands in lakehouse
-- DataFrame/SQL API is desired
+- DataFrame API is preferred
+- micro-batch latency is acceptable
+- integration with lakehouse tables matters
+- streaming and batch logic should be similar
 
 Flink may be better when:
 
-- very low latency
-- complex event-time processing
-- advanced stateful streaming
+- very low latency is required
+- complex event-time/stateful processing dominates
+- advanced streaming operations are central
 
-## 10. Failure Modes
+## 10. Trade-offs
 
-- Failure: checkpoint deleted.
-- Symptom: query may restart incorrectly or duplicate.
-- Recovery: rebuild carefully.
-- Prevention: durable checkpoint path.
+| What We Gain | What We Pay |
+|---|---|
+| DataFrame API for streams | micro-batch latency |
+| batch/stream unification | checkpoint management |
+| Spark ecosystem integration | state tuning |
+| easy Kafka/lake integration | not always as low-latency as Flink |
 
-- Failure: sink slow.
-- Symptom: micro-batches take longer and lag grows.
-- Recovery: optimize sink/batch size/resources.
-- Prevention: monitor batch duration.
+## 11. Failure Modes
 
-- Failure: state grows.
-- Symptom: memory/checkpoint growth.
-- Recovery: watermark/TTL/window cleanup.
-- Prevention: design state lifecycle.
+- Failure: missing checkpoint.
+- Symptom: restart may reprocess from wrong place.
+- Recovery: configure checkpoint and restart carefully.
+- Prevention: durable checkpoint location.
 
-## 11. Common Mistakes
+- Failure: state grows too large.
+- Symptom: slow batches and checkpoint pressure.
+- Recovery: watermark/TTL/filter.
+- Prevention: manage stateful operations.
 
-- Mistake: Treating streaming query like one-time batch.
-- Why it is wrong: it runs continuously.
-- Better approach: monitor it as a service.
+- Failure: sink not idempotent.
+- Symptom: duplicate writes after retry.
+- Recovery: dedupe/transactional sink.
+- Prevention: idempotent output design.
 
-- Mistake: No checkpoint location.
-- Why it is wrong: recovery is unsafe.
-- Better approach: always configure durable checkpointing.
+## 12. Common Mistakes
 
-## 12. Interview Speak
+- Mistake: Treating streaming query like one-time batch job.
+- Why it is wrong: it runs continuously and needs checkpoint/monitoring.
+- Better approach: operate it like a service.
 
-"Spark Structured Streaming treats a stream as an unbounded table and lets us use DataFrame/Spark SQL operations incrementally. It is strong for near-real-time ETL into lakes/lakehouses, especially for Spark teams. Checkpointing, watermarks, output mode, and sink behavior are critical for correctness."
+- Mistake: No watermark for stateful windows.
+- Why it is wrong: state can grow forever.
+- Better approach: event-time watermarking.
 
-## 13. Quick Recall
+## 13. Mini Example
 
-- One-line summary: Structured Streaming is Spark DataFrames for unbounded data.
-- Three keywords: micro-batch, checkpoint, output mode.
-- One trap: Missing checkpoint.
-- One memory trick: A table that keeps receiving rows.
+```text
+Kafka clicks -> Structured Streaming -> 1-minute window counts -> dashboard table
+```
+
+## 14. Interview Questions
+
+1. What is Spark Structured Streaming?
+2. What is micro-batch processing?
+3. Why is checkpoint location important?
+4. Structured Streaming vs Flink?
+5. What are output modes?
+
+## 15. Interview Speak
+
+"Spark Structured Streaming is Spark's DataFrame-based streaming API. It treats streams as continuously growing tables and processes them incrementally, often using micro-batches. It is strong when teams already use Spark and want batch/stream API unification, but checkpointing, state, watermarks, and sink idempotency are critical."
+
+## 16. Quick Recall
+
+- One-line summary: Structured Streaming is Spark DataFrames on unbounded data.
+- Three keywords: micro-batch, checkpoint, watermark.
+- One trap: Running stateful streams without checkpoint/watermark.
+- One memory trick: A table that keeps growing.

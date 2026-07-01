@@ -1,6 +1,6 @@
 # Phase 5 Review: Streaming And Messaging
 
-This review checks whether you understand streaming and messaging from beginner intuition to system design readiness.
+This review checks whether you understand event-driven systems, Kafka, Flink, stream-time concepts, and real-time analytics architecture.
 
 ## Phase Summary
 
@@ -9,9 +9,8 @@ Phase 5 covered:
 - event-driven architecture
 - queues vs event streams
 - Kafka brokers, topics, partitions, offsets, consumer groups
-- Kafka replication, ISR, acknowledgments, retention, compaction, ordering, exactly-once
-- Kafka Connect, Kafka Streams, Schema Registry, Avro
-- DLQs, consumer lag, and streaming backpressure
+- Kafka replication, ISR, producer acks, retention, compaction, ordering, exactly-once
+- Kafka Connect, Kafka Streams, Schema Registry, Avro, DLQ, lag, backpressure
 - Flink, state, checkpointing, watermarks, event time, windows, late events
 - Spark Structured Streaming
 - real-time analytics architecture
@@ -19,71 +18,83 @@ Phase 5 covered:
 Main idea:
 
 ```text
-Streaming systems process facts continuously, so they must handle duplicates, lag, late events, ordering, schemas, state, and recovery.
+Streaming systems process events continuously, so correctness depends on ordering, offsets, state, time, retries, schemas, lag, and failure handling.
 ```
 
-## Checkpoint 1: Topics 107-114
+## Checkpoint 1: Topics 107-108
+
+Topics:
+
+- Event-driven architecture
+- Message queues vs event streams
 
 ### Quiz
 
 1. What is an event?
-2. Queue vs event stream?
-3. What is a Kafka topic?
-4. What is a partition?
-5. What is a consumer group?
+2. Why does event-driven architecture decouple systems?
+3. What is the difference between an event and a command?
+4. When would you use a queue?
+5. When would you use an event stream?
 
 ### Practical Exercise
 
-Design topics for an e-commerce system:
+For an e-commerce order flow, list events:
 
-- orders
-- payments
-- inventory
-- clicks
+- order created
+- payment captured
+- inventory reserved
+- order shipped
 
-For each, choose:
+Then decide which consumers need each event.
 
-- event name
-- message key
+### Mini System Design Question
+
+> Multiple systems need to react when a payment succeeds. Would you use direct service calls, a queue, or an event stream?
+
+Strong direction:
+
+- Use an event stream when many independent consumers need the same event.
+- Consumers can include fraud, email, analytics, ledger, and data lake.
+- Mention schema, idempotency, replay, and eventual consistency.
+
+## Checkpoint 2: Topics 109-121
+
+Topics:
+
+- Kafka overview
+- broker, topic, partition, offset, consumer group
+- replication, ISR, acks, retention, compaction
+- ordering, exactly-once semantics
+
+### Quiz
+
+1. What is Kafka?
+2. What does a broker do?
+3. What is a topic?
+4. What is a partition?
+5. What is an offset?
+6. What is a consumer group?
+7. What is ISR?
+8. What does `acks=all` mean?
+9. What does retention control?
+10. What ordering does Kafka guarantee?
+
+### Practical Exercise
+
+Design a Kafka topic for payment events:
+
+- topic name
+- partition key
 - partition count assumption
+- replication factor
+- retention
+- producer acks
+- schema strategy
 - consumer groups
 
 ### Mini System Design Question
 
-> Multiple services need to react to `OrderCreated`. How would you design it?
-
-Strong direction:
-
-- publish `OrderCreated` to Kafka
-- key by `order_id`
-- separate consumer groups for payment, inventory, analytics, notifications
-- schema registry
-- idempotent consumers
-
-## Checkpoint 2: Topics 115-121
-
-### Quiz
-
-1. What is Kafka replication factor?
-2. What is ISR?
-3. `acks=1` vs `acks=all`?
-4. Retention vs compaction?
-5. What ordering does Kafka guarantee?
-
-### Practical Exercise
-
-For a payment topic, choose:
-
-- replication factor
-- `min.insync.replicas`
-- producer `acks`
-- message key
-- retention
-- schema strategy
-
-### Mini System Design Question
-
-> How do you make Kafka payment events durable?
+> A payment event must not be acknowledged unless safely replicated. What Kafka settings matter?
 
 Strong direction:
 
@@ -91,164 +102,209 @@ Strong direction:
 - `acks=all`
 - `min.insync.replicas=2`
 - idempotent producer
-- schema registry
-- lag and under-replication monitoring
+- monitor ISR/under-replication
+- choose key for ordering
 
 ## Checkpoint 3: Topics 122-128
 
+Topics:
+
+- Kafka Connect
+- Kafka Streams
+- Schema Registry
+- Avro with Kafka
+- Dead letter queues
+- Consumer lag
+- Backpressure in streaming
+
 ### Quiz
 
-1. Kafka Connect source vs sink?
-2. What does Schema Registry protect?
-3. Why use Avro?
-4. What is a DLQ?
-5. What does consumer lag mean?
+1. Source connector vs sink connector?
+2. Kafka Connect vs Kafka Streams?
+3. Why use Schema Registry?
+4. Why is Avro useful?
+5. What goes into a DLQ?
+6. How is consumer lag calculated?
+7. What causes backpressure?
 
 ### Practical Exercise
 
-Design a Kafka-to-data-lake ingestion pipeline:
+Design a Kafka-to-S3 ingestion pipeline:
 
-- source topic
+- input topic
 - schema format
-- sink connector
+- connector type
+- file format
+- error handling
 - DLQ
 - lag monitoring
-- retention plan
 
 ### Mini System Design Question
 
-> A consumer crashes on one bad event and stops processing. What do you change?
+> A consumer fails every time it sees one malformed event and stops processing. What should you do?
 
 Strong direction:
 
-- classify transient vs permanent errors
+- classify retryable vs non-retryable errors
 - bounded retries
-- DLQ bad records
-- include error metadata
-- alert on DLQ growth
-- make processing idempotent
+- DLQ with original payload and error
+- commit offset safely after DLQ write
+- monitor DLQ volume
 
 ## Checkpoint 4: Topics 129-137
 
+Topics:
+
+- Apache Flink
+- Flink state
+- Flink checkpointing
+- Flink watermarks
+- Event time vs processing time
+- Windowing
+- Late events
+- Spark Structured Streaming
+- Real-time analytics architecture
+
 ### Quiz
 
-1. Why use Flink?
-2. What is state?
+1. Kafka vs Flink?
+2. What is Flink state?
 3. What does checkpointing save?
 4. What is a watermark?
 5. Event time vs processing time?
-6. Tumbling vs sliding window?
-7. What are late events?
+6. Tumbling vs sliding vs session window?
+7. What is a late event?
+8. Structured Streaming vs Flink?
 
 ### Practical Exercise
 
-Design a real-time revenue dashboard:
+Design a 5-minute active users metric:
 
-- Kafka input topic
-- event schema
-- stream processor
+- source topic
+- event timestamp
+- key
 - window type
-- watermark/late policy
-- serving store
-- raw data lake sink
+- watermark delay
+- late event policy
+- output sink
 - monitoring
 
 ### Mini System Design Question
 
-> You need ad click metrics within 1 minute, but mobile events can arrive 5 minutes late. How do you design it?
+> Design a real-time ad analytics dashboard showing impressions and clicks by campaign with less than 1 minute freshness.
 
 Strong direction:
 
+- events to Kafka
+- schema validation
+- Flink or Structured Streaming processor
 - event-time windows
-- watermarks
-- allowed lateness
-- preliminary and corrected metrics
-- Kafka retention for replay
-- DLQ for bad events
-- serving store for dashboard
+- watermark and late policy
+- raw archive to data lake
+- serving store like Pinot/Druid/ClickHouse
+- monitor lag, freshness, DLQ, errors
 
 ## Must-Know Concepts
 
-You should be able to explain:
+You should be comfortable explaining:
 
-- event vs command
-- producer, broker, topic, partition, offset
-- consumer group and rebalance
-- Kafka retention vs compaction
-- Kafka ordering per partition
-- ISR and producer acks
-- consumer lag and backpressure
+- event-driven architecture
+- queue vs stream
+- Kafka broker/topic/partition/offset
+- consumer groups and rebalancing
+- replication, ISR, acks
+- retention vs compaction
+- ordering per partition
+- exactly-once scope
+- Kafka Connect vs Kafka Streams
 - Schema Registry and Avro
 - DLQ and poison messages
+- lag and backpressure
 - Flink state and checkpointing
-- event time vs processing time
-- watermarks and late events
-- tumbling/sliding/session windows
-- Spark Structured Streaming checkpointing
-- real-time analytics architecture
+- watermarks and event time
+- windowing and late events
+- Structured Streaming micro-batches
+- real-time analytics serving stores
 
 ## Common Interview Questions
 
 1. Explain Kafka architecture.
-2. Why does Kafka use partitions?
-3. How does a consumer group scale?
-4. What happens if a Kafka broker fails?
-5. What does `acks=all` mean?
-6. What is ISR?
-7. How do you handle duplicate messages?
-8. What is consumer lag and how do you reduce it?
-9. What is a DLQ?
-10. What is event time?
-11. What is a watermark?
+2. How do Kafka partitions provide scale?
+3. What is consumer lag and how do you reduce it?
+4. How does Kafka guarantee ordering?
+5. What is ISR?
+6. What are producer acks?
+7. What is the difference between retention and compaction?
+8. What does exactly-once mean in Kafka?
+9. How do you handle poison messages?
+10. What is a watermark?
+11. How do you handle late events?
 12. Flink vs Spark Structured Streaming?
+13. Design a real-time dashboard.
 
 ## Hands-On Project
 
-Build a mini streaming mental-model pipeline locally.
+Build a local streaming simulator.
 
-### Input Events
+### Input
+
+Use events:
 
 ```text
-event_id, user_id, event_time, arrival_time, amount
+event_id,user_id,event_type,event_time,arrival_time
 ```
 
 ### Steps
 
-1. Assign events to Kafka partitions by `user_id`.
-2. Assign partitions to consumers in a group.
-3. Track offsets.
-4. Simulate one duplicate event.
+1. Partition events by `user_id`.
+2. Assign partitions to consumers in a consumer group.
+3. Track offsets per partition.
+4. Simulate at-least-once retry and duplicate event.
 5. Deduplicate by `event_id`.
-6. Aggregate revenue in 5-minute event-time windows.
-7. Use watermark logic to classify late events.
-8. Send bad records to a DLQ list.
-9. Print lag and window totals.
+6. Apply 5-minute event-time windows.
+7. Use watermark = max event time - 2 minutes.
+8. Send very late events to DLQ.
+9. Print lag and final window counts.
+
+### What This Teaches
+
+- partition keys
+- offsets
+- consumer groups
+- delivery semantics
+- idempotency
+- event time
+- watermarks
+- late events
 
 ## Production Checklist
 
-Before designing a streaming system, ask:
+Before shipping a streaming pipeline, ask:
 
 - What events are produced?
 - What is the schema?
-- What is the message key?
-- How many partitions?
+- Is Schema Registry used?
+- What is the topic name?
+- What is the partition key?
 - What ordering is required?
-- What retention is required?
-- What replication and acks?
-- What consumer groups?
-- What is the expected throughput?
-- What is acceptable lag?
+- What is the partition count?
+- What is replication factor?
+- What are producer acks?
+- What is retention?
+- Is compaction needed?
+- What consumer groups exist?
+- How are offsets committed?
+- What delivery semantics are required?
 - Are consumers idempotent?
-- What is the DLQ strategy?
-- How are schemas evolved?
-- Is event time required?
-- What watermark and lateness policy?
-- What state is stored?
-- How are checkpoints configured?
-- What is the serving store?
-- How do we replay/backfill?
-- What is monitored?
+- What is the DLQ policy?
+- How is lag monitored?
+- What is the backpressure strategy?
+- Is event time or processing time used?
+- What watermark delay is chosen?
+- How are late events handled?
+- Where are raw events archived?
+- What serving store powers dashboards?
 
 ## Final Phase 5 Interview Answer
 
-"For streaming, I would model business facts as events, publish them to Kafka topics with clear schemas and keys, choose partitions based on throughput and ordering, and use consumer groups for independent processing. I would configure replication, ISR, and producer acknowledgments based on durability needs. For stream processing, I would use Flink or Spark Structured Streaming depending on latency, state, and ecosystem needs. I would design for idempotency, DLQs, consumer lag, backpressure, event time, watermarks, late events, checkpointing, replay, and monitoring."
+"For streaming systems, I start with the event model and correctness needs. Kafka is the event backbone: producers write to partitioned topics, consumers read by offsets, consumer groups scale processing, and replication/ISR/acks protect durability. I use Schema Registry and Avro for contracts, DLQs for poison records, and lag/backpressure monitoring for operations. For stateful event-time processing, I consider Flink or Structured Streaming, with checkpoints, watermarks, windows, and late-event policy. For real-time analytics, I archive raw events, process streams into aggregates, and serve them from an OLAP/serving store while monitoring freshness, errors, and lag."
