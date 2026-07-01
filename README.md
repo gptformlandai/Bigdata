@@ -113,6 +113,61 @@ After every phase, review:
         +-- topic-107-event-driven-architecture.md
         +-- topic-108-...
         +-- topic-137-real-time-analytics-architecture.md
+    +-- phase-06-modern-data-lakehouse
+        +-- README.md
+        +-- examples
+            +-- topic_143_snapshot_isolation_demo.py
+            +-- topic_147_cow_vs_mor_simulation.py
+            +-- topic_148_upsert_merge_demo.py
+            +-- topic_150_partition_evolution_demo.py
+        +-- phase-06-review.md
+        +-- topic-138-data-lakehouse-architecture.md
+        +-- topic-139-...
+        +-- topic-154-lakehouse-performance-tuning.md
+    +-- phase-07-warehouses-query-engines
+        +-- README.md
+        +-- examples
+            +-- topic_165_columnar_pruning_demo.py
+            +-- topic_166_mpp_aggregation_demo.py
+            +-- topic_169_materialized_view_demo.py
+            +-- topic_174_scd_type2_demo.py
+        +-- phase-07-review.md
+        +-- topic-155-data-warehouse-architecture.md
+        +-- topic-156-...
+        +-- topic-175-data-modeling-for-analytics.md
+    +-- phase-08-orchestration-dataops
+        +-- README.md
+        +-- examples
+            +-- topic_177_dag_topological_order_demo.py
+            +-- topic_182_retry_backoff_demo.py
+            +-- topic_189_data_contract_validator.py
+            +-- topic_194_alert_severity_router.py
+        +-- phase-08-review.md
+        +-- topic-176-apache-airflow.md
+        +-- topic-177-...
+        +-- topic-195-incident-response-for-data-pipelines.md
+    +-- phase-09-cloud-big-data
+        +-- README.md
+        +-- examples
+            +-- topic_196_cloud_lake_path_builder.py
+            +-- topic_200_stream_partition_demo.py
+            +-- topic_212_query_scan_cost_demo.py
+            +-- topic_213_iam_least_privilege_checker.py
+        +-- phase-09-review.md
+        +-- topic-196-aws-s3.md
+        +-- topic-197-...
+        +-- topic-215-vpc-networking-basics-for-data-platforms.md
+    +-- phase-10-security-governance-compliance
+        +-- README.md
+        +-- examples
+            +-- topic_217_authorization_policy_demo.py
+            +-- topic_225_masking_tokenization_demo.py
+            +-- topic_231_row_column_security_demo.py
+            +-- topic_233_retention_policy_demo.py
+        +-- phase-10-review.md
+        +-- topic-216-authentication.md
+        +-- topic-217-...
+        +-- topic-235-governance-at-scale.md
 ```
 
 ## Current Progress
@@ -125,7 +180,12 @@ After every phase, review:
 | Phase 3: Hadoop Ecosystem | 061-077 | Complete |
 | Phase 4: Spark And Batch Processing | 078-106 | Complete |
 | Phase 5: Streaming And Messaging | 107-137 | Complete |
+| Phase 6: Modern Data Lakehouse | 138-154 | Complete |
+| Phase 7: Warehouses And Query Engines | 155-175 | Complete |
+| Phase 8: Orchestration And DataOps | 176-195 | Complete |
+| Phase 9: Cloud Big Data | 196-215 | Complete |
+| Phase 10: Security, Governance, And Compliance | 216-235 | Complete |
 
 ## Next Topic
 
-Phase 6, Topic 138: Data lakehouse architecture. Phase 1 is still available if you want to fill the skipped Big Data basics.
+Phase 11, Topic 236: Lambda architecture. Phase 1 is still available if you want to fill the skipped Big Data basics.

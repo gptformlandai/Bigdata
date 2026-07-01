@@ -171,6 +171,8 @@ Status: Complete.
 
 ## Phase 6: Modern Data Lakehouse
 
+Status: Complete.
+
 138. Data lakehouse architecture
 139. Apache Iceberg
 140. Delta Lake
@@ -190,6 +192,8 @@ Status: Complete.
 154. Lakehouse performance tuning
 
 ## Phase 7: Warehouses And Query Engines
+
+Status: Complete.
 
 155. Data warehouse architecture
 156. Snowflake
@@ -215,6 +219,8 @@ Status: Complete.
 
 ## Phase 8: Orchestration And DataOps
 
+Status: Complete.
+
 176. Apache Airflow
 177. DAGs
 178. Airflow scheduler
@@ -238,6 +244,8 @@ Status: Complete.
 
 ## Phase 9: Cloud Big Data
 
+Status: Complete.
+
 196. AWS S3
 197. AWS EMR
 198. AWS Glue
@@ -260,6 +268,8 @@ Status: Complete.
 215. VPC/networking basics for data platforms
 
 ## Phase 10: Security, Governance, And Compliance
+
+Status: Complete.
 
 216. Authentication
 217. Authorization
